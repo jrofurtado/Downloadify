@@ -88,11 +88,19 @@
      var init = function(){
        base.options = options;
 
+      if( typeof(base.options.hidden) != 'undefined' && base.options.hidden ){
+          base.options.append = true;
+          base.options.downloadImage = null;
+          base.options.height = el.offsetHeight;
+          base.options.transparent = true;
+          base.options.width = el.offsetWidth;
+      }
+
       if( !base.options.append ) base.el.innerHTML = "";
       
       base.flashContainer = document.createElement('span');
       base.el.appendChild(base.flashContainer);
-        
+
       base.queue_name = Downloadify.getUID( base.flashContainer );
  
       if( typeof(base.options.filename) === "function" )
@@ -104,14 +112,14 @@
         base.dataCallback = base.options.data;
       else if (base.options.data)
         base.data = base.options.data;
-        
-        
+
+
       var flashVars = {
         queue_name: base.queue_name,
         width: base.options.width,
         height: base.options.height
       };
-      
+
       var params = {
         allowScriptAccess: 'always'
       };
@@ -124,10 +132,19 @@
       if(base.options.enabled === false) base.enabled = false;
       
       if(base.options.transparent === true) params.wmode = "transparent";
-      
-      if(base.options.downloadImage) flashVars.downloadImage = base.options.downloadImage;
-      
-      swfobject.embedSWF(base.options.swf, base.flashContainer.id, base.options.width, base.options.height, "10", null, flashVars, params, attributes );
+
+      if(base.options.downloadImage || base.options.hidden) flashVars.downloadImage = base.options.downloadImage;
+
+      swfobject.embedSWF(base.options.swf,
+                         base.flashContainer.id,
+                         base.options.width,
+                         base.options.height,
+                         "10",
+                         null,
+                         flashVars,
+                         params,
+                         attributes,
+                         base.swfObjectCallback);
 
       Downloadify.addToQueue( base );
      };
@@ -161,6 +178,27 @@
       if (base.options.dataType) return base.options.dataType;
       return "string";
     };
+
+    base.swfObjectCallback = function(event){
+      if (!event.success || !base.options.hidden) return;
+      // set the parent element to use relative positioning
+      var parentNode = event.ref.parentNode;
+      parentNode.style.position = 'relative';
+      // suppress the default click action if the parent node is an anchor tag
+      if (parentNode.nodeName.toLowerCase() == 'a') {
+        if (typeof(parentNode.addEventListener) != 'undefined') {
+          parentNode.addEventListener('click', function(e){e.preventDefault();return false;}, false);
+        } else if (typeof(parentNode.attachEvent) != 'undefined') {
+          // older versions of internet explorer
+          parentNode.attachEvent('click', function(e){e.preventDefault();return false;});
+        }
+      }
+      // set the flash object to use absolute positioning
+      event.ref.style.position = 'absolute';
+      event.ref.style.left = 0;
+      event.ref.style.top = 0;
+      event.ref.style.zIndex = 9999;
+    };
     
     base.complete = function(){
       if( typeof(base.options.onComplete) === "function" ) base.options.onComplete();
@@ -182,6 +220,7 @@
     downloadImage: 'images/download.png',
     width: 100,
     height: 30,
+    hidden: false,
     transparent: true,
     append: false,
     dataType: "string"

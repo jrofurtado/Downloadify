@@ -1,4 +1,4 @@
-/*
+﻿/*
   Downloadify: Client Side File Creation
   JavaScript + Flash Library
 
@@ -34,6 +34,7 @@ package {
   import flash.display.*;
   import flash.utils.ByteArray;
   import flash.external.ExternalInterface;
+  import com.adobe.images.PNGEncoder;
   import com.dynamicflash.util.Base64;
   
   [SWF(backgroundColor="#CCCCCC")]
@@ -103,8 +104,14 @@ package {
     
     private function setupDefaultButton():void {
       button = new Loader();
-      var urlReq:URLRequest = new URLRequest(buttonImage);
-      button.load(urlReq);
+      if(buttonImage && buttonImage != 'null'){
+		var urlReq:URLRequest = new URLRequest(buttonImage);
+        button.load(urlReq);		  
+      } else {
+        var data:BitmapData = new BitmapData(_width, 4 * _height, true, 0x00ffffff);
+        var bytes:ByteArray = PNGEncoder.encode(data);
+        button.loadBytes(bytes);
+      }
       button.x = 0;
       button.y = 0;
     }

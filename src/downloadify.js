@@ -25,58 +25,58 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-(function () {
+(function() {
     Downloadify = window.Downloadify = {
         queue: {},
         uid: new Date().getTime(),
-        getTextForSave: function ( queue ) {
+        getTextForSave: function( queue ) {
             var obj = Downloadify.queue[queue];
             if ( obj ) {
                 return obj.getData();
             }
             return "";
         },
-        getFileNameForSave: function ( queue ) {
+        getFileNameForSave: function( queue ) {
             var obj = Downloadify.queue[queue];
             if ( obj ) {
                 return obj.getFilename();
             }
             return "";
         },
-        getDataTypeForSave: function ( queue ) {
+        getDataTypeForSave: function( queue ) {
             var obj = Downloadify.queue[queue];
             if ( obj ) {
                 return obj.getDataType();
             }
             return "";
         },
-        saveComplete: function ( queue ) {
+        saveComplete: function( queue ) {
             var obj = Downloadify.queue[queue];
             if ( obj ) {
                 obj.complete();
             }
             return true;
         },
-        saveCancel: function ( queue ) {
+        saveCancel: function( queue ) {
             var obj = Downloadify.queue[queue];
             if ( obj ) {
                 obj.cancel();
             }
             return true;
         },
-        saveError: function ( queue ) {
+        saveError: function( queue ) {
             var obj = Downloadify.queue[queue];
             if ( obj ) {
                 obj.error();
             }
             return true;
         },
-        addToQueue: function ( container ) {
+        addToQueue: function( container ) {
             Downloadify.queue[container.queue_name] = container;
         },
         // Concept adapted from: http://tinyurl.com/yzsyfto
         // SWF object runs off of ID's, so this is the good way to get a unique ID
-        getUID: function ( el ) {
+        getUID: function( el ) {
             if ( el.id == "" ) {
                 el.id = 'downloadify_' + Downloadify.uid++;
             }
@@ -84,12 +84,12 @@
         }
     };
 
-    Downloadify.create = function ( idOrDOM, options ) {
+    Downloadify.create = function( idOrDOM, options ) {
         var el = (typeof(idOrDOM) == "string" ? document.getElementById( idOrDOM ) : idOrDOM );
         return new Downloadify.Container( el, options );
     };
 
-    Downloadify.Container = function ( el, options ) {
+    Downloadify.Container = function( el, options ) {
         var base = this;
 
         base.el = el;
@@ -99,7 +99,7 @@
         base.data = null;
         base.filename = null;
 
-        var init = function () {
+        var init = function() {
             base.options = options;
 
             if ( typeof(base.options.hidden) != 'undefined' && base.options.hidden ) {
@@ -173,19 +173,19 @@
             Downloadify.addToQueue( base );
         };
 
-        base.enable = function () {
+        base.enable = function() {
             var swf = document.getElementById( base.flashContainer.id );
             swf.setEnabled( true );
             base.enabled = true;
         };
 
-        base.disable = function () {
+        base.disable = function() {
             var swf = document.getElementById( base.flashContainer.id );
             swf.setEnabled( false );
             base.enabled = false;
         };
 
-        base.getData = function () {
+        base.getData = function() {
             if ( !base.enabled ) {
                 return "";
             }
@@ -198,7 +198,7 @@
             }
         };
 
-        base.getFilename = function () {
+        base.getFilename = function() {
             if ( base.filenameCallback ) {
                 return base.filenameCallback();
             } else if ( base.filename ) {
@@ -208,14 +208,14 @@
             }
         };
 
-        base.getDataType = function () {
+        base.getDataType = function() {
             if ( base.options.dataType ) {
                 return base.options.dataType;
             }
             return "string";
         };
 
-        base.swfObjectCallback = function ( event ) {
+        base.swfObjectCallback = function( event ) {
             if ( !event.success || !base.options.hidden ) {
                 return;
             }
@@ -225,13 +225,13 @@
             // suppress the default click action if the parent node is an anchor tag
             if ( parentNode.nodeName.toLowerCase() == 'a' ) {
                 if ( typeof(parentNode.addEventListener) != 'undefined' ) {
-                    parentNode.addEventListener( 'click', function ( e ) {
+                    parentNode.addEventListener( 'click', function( e ) {
                         e.preventDefault();
                         return false;
                     }, false );
                 } else if ( typeof(parentNode.attachEvent) != 'undefined' ) {
                     // older versions of internet explorer
-                    parentNode.attachEvent( 'click', function ( e ) {
+                    parentNode.attachEvent( 'click', function( e ) {
                         e.preventDefault();
                         return false;
                     } );
@@ -244,19 +244,19 @@
             event.ref.style.zIndex = 9999;
         };
 
-        base.complete = function () {
+        base.complete = function() {
             if ( typeof(base.options.onComplete) === "function" ) {
                 base.options.onComplete();
             }
         };
 
-        base.cancel = function () {
+        base.cancel = function() {
             if ( typeof(base.options.onCancel) === "function" ) {
                 base.options.onCancel();
             }
         };
 
-        base.error = function () {
+        base.error = function() {
             if ( typeof(base.options.onError) === "function" ) {
                 base.options.onError();
             }
@@ -279,9 +279,9 @@
 
 // Support for jQuery
 if ( typeof(jQuery) != "undefined" ) {
-    (function ( $ ) {
-        $.fn.downloadify = function ( options ) {
-            return this.each( function () {
+    (function( $ ) {
+        $.fn.downloadify = function( options ) {
+            return this.each( function() {
                 options = $.extend( {}, Downloadify.defaultOptions, options );
                 var dl = Downloadify.create( this, options );
                 $( this ).data( 'Downloadify', dl );
@@ -293,7 +293,7 @@ if ( typeof(jQuery) != "undefined" ) {
 /* mootools helper */
 if ( typeof(MooTools) != 'undefined' ) {
     Element.implement( {
-        downloadify: function ( options ) {
+        downloadify: function( options ) {
             options = $merge( Downloadify.defaultOptions, options );
             return this.store( 'Downloadify', Downloadify.create( this, options ) );
         }

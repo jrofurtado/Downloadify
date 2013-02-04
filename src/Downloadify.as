@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Downloadify: Client Side File Creation
  * JavaScript + Flash Library
  *
@@ -36,7 +36,6 @@ package {
     import flash.system.Security;
     import flash.utils.ByteArray;
 
-    import com.adobe.images.PNGEncoder;
     import com.dynamicflash.util.Base64;
 
     [SWF(backgroundColor="#CCCCCC")]
@@ -48,9 +47,9 @@ package {
         private var enabled:Boolean = true;
         private var over:Boolean = false;
 
-        private var file:FileReference = new FileReference();
+        private var button:DisplayObject;
 
-        private var button:Loader;
+        private var file:FileReference = new FileReference();
 
         private var _width:Number = 0;
         private var _height:Number = 0;
@@ -59,18 +58,19 @@ package {
         private var queue_name:String = "";
 
         /**
-         * Create a transparent PNG of x * y dimensions
-         * @param x The width
-         * @param y The height
-         * @return The generated image
+         * Create a transparent Sprite with w * h dimensions
+         * @param w The width
+         * @param h The height
+         * @return The Sprite
          */
-        public static function createTransparentPNG( x:Number, y:Number ):Loader
+        public static function createTransparentSprite( w:Number, h:Number ):Sprite
         {
-            var loader:Loader = new Loader();
-            var data:BitmapData = new BitmapData( x, y, true, 0x00ffffff );
-            var bytes:ByteArray = PNGEncoder.encode( data );
-            loader.loadBytes( bytes );
-            return loader;
+            var sprite:Sprite = new Sprite();
+            sprite.graphics.beginFill( 0xffffff );
+            sprite.graphics.drawRect( 0, 0, w, h );
+            sprite.graphics.endFill();
+            sprite.alpha = 0;
+            return sprite;
         }
 
         /**
@@ -94,7 +94,7 @@ package {
             // configure the security context
             Security.allowDomain( '*' );
 
-            // configure the stage 
+            // configure the stage
             stage.align = StageAlign.TOP_LEFT;
             stage.scaleMode = StageScaleMode.NO_SCALE;
 
@@ -104,8 +104,8 @@ package {
             this._height = options.height;
 
             if ( options.hidden == 'true' ) {
-                // use a transparent image for the save button - the height is x4 for animations
-                this.button = Downloadify.createTransparentPNG( this._width, 4 * this._height );
+                // use a transparent sprite for the save button - the height is x4 for animations
+                this.button = Downloadify.createTransparentSprite( this._width, 4 * this._height );
                 this.buttonImage = null;
             } else {
                 // use an external image for the save button

@@ -112,6 +112,43 @@
 
             if ( !base.options.append ) {
                 base.el.innerHTML = "";
+            } else {
+                // enable data uri fallback for supporting browsers
+                if ( el.nodeName.toLowerCase() === "a" && !navigator.userAgent.match( /MSIE/i ) ) {
+                    // assign an href to the element if not already set
+                    if ( !el.getAttribute( 'href' ) ) {
+                        el.setAttribute( 'href', 'javascript:return;' );
+                    }
+
+                    // provide the filename to the fallback
+                    var fnGetFilename = typeof(base.options.filename) == 'function'
+                            ? base.options.filename
+                            : new function() { return base.options.filename };
+
+                    // provide the file data to the fallback
+                    var fnGetData = typeof(base.options.data) == 'function'
+                            ? base.options.data
+                            : new function() { return base.options.data };
+
+                    // fallback mouseover event
+                    var fnGetDataUri = function() {
+                        var dataUri = 'data:application/octet-stream';
+                        var data = fnGetData();
+                        var filename = fnGetFilename();
+                        if ( typeof( window.btoa ) === "function" ) {
+                            dataUri += ';base64,' + window.btoa( data );
+                        } else {
+                            dataUri += ',' + encodeURIComponent( data );
+                        }
+                        el.setAttribute( 'download', filename );
+                        el.setAttribute( 'href', dataUri );
+                    };
+
+                    // attach the fallback
+                    if ( typeof( el.addEventListener ) != 'undefined' ) {
+                        el.addEventListener( 'mousedown', fnGetDataUri, false );
+                    }
+                }
             }
 
             base.flashContainer = document.createElement( 'span' );
@@ -139,7 +176,8 @@
             };
 
             var params = {
-                allowScriptAccess: 'always'
+                allowScriptAccess: 'always',
+                menu: false
             };
 
             var attributes = {

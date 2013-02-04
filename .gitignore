@@ -1,0 +1,26 @@
+# Platform
+.Trashes/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.bak
+*.log
+*.swp
+*.tmp
+*~
+
+# IDE
+## Eclipse
+.settings/
+.buildpath
+.project
+
+
+## IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+
+## NetBeans
+nbproject/

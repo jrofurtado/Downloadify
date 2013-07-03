@@ -24,3 +24,7 @@ desktop.ini
 
 ## NetBeans
 nbproject/
+
+## Dart pub
+packages
+pubspec.lock
